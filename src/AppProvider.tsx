@@ -8,6 +8,7 @@ import { useFonts } from "expo-font";
 import { StatusBar as ExpoStatusBar } from "expo-status-bar";
 import React, { FC, ReactNode } from "react";
 import { StatusBar, useColorScheme } from "react-native";
+import { PortalProvider } from "tamagui";
 import tamaguiConfig from "../tamagui.config";
 import { useAppStore } from "./store";
 
@@ -24,11 +25,13 @@ const AppProvider: FC<{ children: ReactNode }> = ({ children }) => {
 
   return (
     <TamaguiProvider config={tamaguiConfig} defaultTheme={colorScheme!}>
-      <Theme name={theme}>
-        <View flex={1} paddingTop={StatusBar.currentHeight}>
-          <NavigationContainer>{children}</NavigationContainer>
-        </View>
-      </Theme>
+      <PortalProvider>
+        <Theme name={theme}>
+          <View flex={1} paddingTop={StatusBar.currentHeight}>
+            <NavigationContainer>{children}</NavigationContainer>
+          </View>
+        </Theme>
+      </PortalProvider>
 
       <ExpoStatusBar
         // @ts-ignore
