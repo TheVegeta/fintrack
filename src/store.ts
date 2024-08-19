@@ -6,11 +6,17 @@ import { createJSONStorage, persist } from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
 import { expensesCategory, incomeCategory } from "./data/category";
 
-interface IExpenses {
+export interface IExpenses {
   date: Date;
   categoryId: string;
   amt: number;
   notes: string;
+  _id: string;
+}
+
+export interface ICategory {
+  name: string;
+  icon: string;
   _id: string;
 }
 
@@ -23,8 +29,8 @@ interface AppState {
   userName: string;
   setUserName: (userName: string) => void;
 
-  incomeCategory: { name: string; icon: string; _id: string }[];
-  expensesCategory: { name: string; icon: string; _id: string }[];
+  incomeCategory: ICategory[];
+  expensesCategory: ICategory[];
 
   monthlyIncome: IExpenses[];
   monthlyExpenses: IExpenses[];
