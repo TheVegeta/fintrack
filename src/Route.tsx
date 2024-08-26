@@ -11,6 +11,7 @@ import { Separator, Tabs } from "tamagui";
 import Category from "./screen/Category";
 import Chart from "./screen/Chart";
 import History from "./screen/History";
+import HistoryTransaction from "./screen/HistoryTransaction";
 import Home from "./screen/Home";
 import LandingPage from "./screen/LandingPage";
 import { useAppStore } from "./store";
@@ -18,12 +19,14 @@ import { useAppStore } from "./store";
 export type IRootParams = {
   landing: undefined;
   bottomTab: undefined;
+  historyTransaction: { date: string };
 };
 
 export type IBottomTabParams = {
   home: undefined;
   chart: undefined;
   history: undefined;
+
   category: undefined;
 };
 
@@ -149,6 +152,7 @@ const Route = () => {
     >
       <Stack.Screen name="landing" component={LandingPage} />
       <Stack.Screen name="bottomTab" component={MyBottomTabs} />
+      <Stack.Screen name="historyTransaction" component={HistoryTransaction} />
     </Stack.Navigator>
   );
 };

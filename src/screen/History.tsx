@@ -1,4 +1,8 @@
-import { useIsFocused } from "@react-navigation/native";
+import {
+  NavigationProp,
+  useIsFocused,
+  useNavigation,
+} from "@react-navigation/native";
 import { FlashList, ListRenderItem } from "@shopify/flash-list";
 import { ArrowRight } from "@tamagui/lucide-icons";
 import _ from "lodash";
@@ -6,9 +10,16 @@ import moment from "moment";
 import React, { FC, useCallback, useState } from "react";
 import { Button, Heading, Paragraph, Separator, View } from "tamagui";
 import { useRunAfterInteraction } from "../hooks/useRunAfterInteraction";
+import { IRootParams } from "../Route";
 import { useAppStore } from "../store";
 
 const RenderMonthList: FC<{ month: string }> = ({ month }) => {
+  const { navigate } = useNavigation<NavigationProp<IRootParams>>();
+
+  const handleNavigate = () => {
+    navigate("historyTransaction", { date: month });
+  };
+
   return (
     <View
       key={month}
@@ -18,6 +29,7 @@ const RenderMonthList: FC<{ month: string }> = ({ month }) => {
       my="$1.5"
       justifyContent="space-between"
       flex={1}
+      onPress={handleNavigate}
     >
       <Paragraph fontSize="$5">
         {moment(month).format("MMM")} {moment(month).format("Y")}
