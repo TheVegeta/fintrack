@@ -8,7 +8,9 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import React, { FC } from "react";
 import { InteractionManager } from "react-native";
 import { Separator, Tabs } from "tamagui";
+import Category from "./screen/Category";
 import Chart from "./screen/Chart";
+import History from "./screen/History";
 import Home from "./screen/Home";
 import LandingPage from "./screen/LandingPage";
 import { useAppStore } from "./store";
@@ -21,6 +23,8 @@ export type IRootParams = {
 export type IBottomTabParams = {
   home: undefined;
   chart: undefined;
+  history: undefined;
+  category: undefined;
 };
 
 const Stack = createNativeStackNavigator<IRootParams>();
@@ -32,6 +36,18 @@ const BottomTabBar: FC<BottomTabBarProps> = ({ navigation, state }) => {
   const handleHomeNavigation = () => {
     InteractionManager.runAfterInteractions(() => {
       navigate("home");
+    });
+  };
+
+  const handleCategoryNavigation = () => {
+    InteractionManager.runAfterInteractions(() => {
+      navigate("category");
+    });
+  };
+
+  const handleHistoryNavigation = () => {
+    InteractionManager.runAfterInteractions(() => {
+      navigate("history");
     });
   };
 
@@ -75,6 +91,7 @@ const BottomTabBar: FC<BottomTabBarProps> = ({ navigation, state }) => {
             alignItems="center"
             gap="$1.5"
             h={50}
+            onPress={handleCategoryNavigation}
           >
             <FontAwesome6 name="tags" size={15} color="black" />
           </Tabs.Tab>
@@ -85,6 +102,7 @@ const BottomTabBar: FC<BottomTabBarProps> = ({ navigation, state }) => {
             alignItems="center"
             gap="$1.5"
             h={50}
+            onPress={handleHistoryNavigation}
           >
             <FontAwesome6 name="clock-rotate-left" size={15} color="black" />
           </Tabs.Tab>
@@ -115,6 +133,8 @@ export const MyBottomTabs = () => {
     >
       <Tab.Screen name="home" component={Home} />
       <Tab.Screen name="chart" component={Chart} />
+      <Tab.Screen name="history" component={History} />
+      <Tab.Screen name="category" component={Category} />
     </Tab.Navigator>
   );
 };

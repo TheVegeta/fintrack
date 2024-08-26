@@ -1,11 +1,12 @@
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import { useIsFocused } from "@react-navigation/native";
+import { FlashList, ListRenderItem } from "@shopify/flash-list";
 import { ArrowDownLeft, ArrowUpRight, Eye } from "@tamagui/lucide-icons";
 import { useToggle } from "ahooks";
 import { Formik, FormikHelpers } from "formik";
 import _ from "lodash";
 import moment from "moment";
-import React, { FC, useMemo, useState } from "react";
+import React, { FC, useCallback, useMemo, useState } from "react";
 import { InteractionManager } from "react-native";
 import { FloatingMenu } from "react-native-floating-action-menu";
 import { RenderState } from "react-native-floating-action-menu/dist/src/components/FloatingMenu";
@@ -28,6 +29,8 @@ import { currencyList } from "../data/currencyList";
 import { useRunAfterInteraction } from "../hooks/useRunAfterInteraction";
 import { IExpenses, useAppStore } from "../store";
 import { findCategory } from "../utils";
+
+type ITransactionHistory = IExpenses & { type: "IN" | "OUT"; fmtAmt: string };
 
 const validationSchema = Yup.object().shape({
   name: Yup.string()
@@ -101,13 +104,60 @@ const FloatingButton: FC<{
   );
 };
 
+const RenderTransactionList: FC<{ item: ITransactionHistory }> = ({ item }) => {
+  const incomeCategory = useAppStore((state) => state.incomeCategory);
+  const expensesCategory = useAppStore((state) => state.expensesCategory);
+
+  return (
+    <View
+      key={item._id}
+      flexDirection="row"
+      alignItems="center"
+      gap="$3"
+      my="$1.5"
+      justifyContent="space-between"
+    >
+      <View flexDirection="row" alignItems="center" gap="$3">
+        <Button
+          p="$0"
+          px="$3"
+          icon={
+            item.type === "IN" ? (
+              <ArrowDownLeft size={20} mb="$1" />
+            ) : (
+              <ArrowUpRight size={20} mb="$1" />
+            )
+          }
+        />
+
+        <View>
+          <Paragraph fontSize="$5">
+            {
+              findCategory(item.categoryId, [
+                ...expensesCategory,
+                ...incomeCategory,
+              ])?.name
+            }
+          </Paragraph>
+          <Text fontSize="$1">{moment(item.date).format("DD/MM/YYYY")}</Text>
+        </View>
+      </View>
+
+      <Heading
+        fontSize="$5"
+        color={item.type === "IN" ? "$green11" : "$gray11"}
+      >
+        {item.type === "IN" ? "+" : "-"} {item.fmtAmt}
+      </Heading>
+    </View>
+  );
+};
+
 const Home = () => {
   const userName = useAppStore((state) => state.userName);
   const currencyCode = useAppStore((state) => state.currencyCode);
   const monthlyIncome = useAppStore((state) => state.monthlyIncome);
   const monthlyExpenses = useAppStore((state) => state.monthlyExpenses);
-  const incomeCategory = useAppStore((state) => state.incomeCategory);
-  const expensesCategory = useAppStore((state) => state.expensesCategory);
   const setUserName = useAppStore((state) => state.setUserName);
 
   const [isOpen, { toggle }] = useToggle(false);
@@ -119,7 +169,7 @@ const Home = () => {
   const [initialValue, setInitialValue] = useState({ name: "" });
   const [stat, setStat] = useState({ monthlyIncome: "", monthlyExpenses: "" });
   const [transactionHistory, setTransactionHistory] = useState<
-    Array<IExpenses & { type: "IN" | "OUT"; fmtAmt: string }>
+    ITransactionHistory[]
   >([]);
 
   useRunAfterInteraction(() => {
@@ -214,6 +264,11 @@ const Home = () => {
     });
   };
 
+  const renderItem: ListRenderItem<ITransactionHistory> = useCallback(
+    ({ item }) => <RenderTransactionList item={item} />,
+    []
+  );
+
   return (
     <>
       <View flex={1} bg="$color2" px="$6">
@@ -255,7 +310,7 @@ const Home = () => {
 
         <Separator borderWidth="$0.5" my="$2.5" />
 
-        <View>
+        <View flex={1}>
           <View flexDirection="row" justifyContent="space-between">
             <Paragraph fontSize="$6" my="$2">
               Recent Transactions
@@ -268,53 +323,11 @@ const Home = () => {
             />
           </View>
 
-          {transactionHistory.map((item) => {
-            return (
-              <View
-                key={item._id}
-                flexDirection="row"
-                alignItems="center"
-                gap="$3"
-                my="$1.5"
-                justifyContent="space-between"
-              >
-                <View flexDirection="row" alignItems="center" gap="$3">
-                  <Button
-                    p="$0"
-                    px="$3"
-                    icon={
-                      item.type === "IN" ? (
-                        <ArrowDownLeft size={20} mb="$1" />
-                      ) : (
-                        <ArrowUpRight size={20} mb="$1" />
-                      )
-                    }
-                  />
-
-                  <View>
-                    <Paragraph fontSize="$5">
-                      {
-                        findCategory(item.categoryId, [
-                          ...expensesCategory,
-                          ...incomeCategory,
-                        ])?.name
-                      }
-                    </Paragraph>
-                    <Text fontSize="$1">
-                      {moment(item.date).format("DD/MM/YYYY")}
-                    </Text>
-                  </View>
-                </View>
-
-                <Heading
-                  fontSize="$5"
-                  color={item.type === "IN" ? "$green11" : "$gray11"}
-                >
-                  {item.type === "IN" ? "+" : "-"} {item.fmtAmt}
-                </Heading>
-              </View>
-            );
-          })}
+          <FlashList
+            data={transactionHistory}
+            estimatedItemSize={transactionHistory.length}
+            renderItem={renderItem}
+          />
         </View>
       </View>
 
