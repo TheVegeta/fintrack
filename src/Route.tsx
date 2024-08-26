@@ -3,9 +3,12 @@ import {
   BottomTabBarProps,
   createBottomTabNavigator,
 } from "@react-navigation/bottom-tabs";
+import { NavigationProp, useNavigation } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import React, { FC } from "react";
+import { InteractionManager } from "react-native";
 import { Separator, Tabs } from "tamagui";
+import Chart from "./screen/Chart";
 import Home from "./screen/Home";
 import LandingPage from "./screen/LandingPage";
 import { useAppStore } from "./store";
@@ -17,12 +20,27 @@ export type IRootParams = {
 
 export type IBottomTabParams = {
   home: undefined;
+  chart: undefined;
 };
 
 const Stack = createNativeStackNavigator<IRootParams>();
 const Tab = createBottomTabNavigator<IBottomTabParams>();
 
 const BottomTabBar: FC<BottomTabBarProps> = ({ navigation, state }) => {
+  const { navigate } = useNavigation<NavigationProp<IBottomTabParams>>();
+
+  const handleHomeNavigation = () => {
+    InteractionManager.runAfterInteractions(() => {
+      navigate("home");
+    });
+  };
+
+  const handleChartNavigation = () => {
+    InteractionManager.runAfterInteractions(() => {
+      navigate("chart");
+    });
+  };
+
   return (
     <>
       <Tabs
@@ -46,6 +64,7 @@ const BottomTabBar: FC<BottomTabBarProps> = ({ navigation, state }) => {
             alignItems="center"
             gap="$1.5"
             h={50}
+            onPress={handleHomeNavigation}
           >
             <FontAwesome6 name="house" size={15} color="black" />
           </Tabs.Tab>
@@ -76,6 +95,7 @@ const BottomTabBar: FC<BottomTabBarProps> = ({ navigation, state }) => {
             alignItems="center"
             gap="$1.5"
             h={50}
+            onPress={handleChartNavigation}
           >
             <FontAwesome6 name="chart-pie" size={15} color="black" />
           </Tabs.Tab>
@@ -94,6 +114,7 @@ export const MyBottomTabs = () => {
       tabBar={(props) => <BottomTabBar {...props} />}
     >
       <Tab.Screen name="home" component={Home} />
+      <Tab.Screen name="chart" component={Chart} />
     </Tab.Navigator>
   );
 };

@@ -16,6 +16,7 @@ import {
   Spinner,
   Text,
   TextArea,
+  useTheme,
   View,
 } from "tamagui";
 
@@ -134,6 +135,7 @@ export const CustomSelectCategory: FC<{
   options,
 }) => {
   const { width } = useWindowDimensions();
+  const theme = useTheme();
 
   const handleChange = (value: string) => {
     setFieldValue(fieldName, value);
@@ -147,7 +149,10 @@ export const CustomSelectCategory: FC<{
 
       <Select onValueChange={handleChange} value={_.toString(value)}>
         <Select.Trigger borderColor={isInvalid ? "$red9" : undefined}>
-          <Select.Value placeholder={placeholder} />
+          <Select.Value
+            color={value ? undefined : theme.color9["val"]}
+            placeholder={placeholder}
+          />
         </Select.Trigger>
         {isInvalid && <Text color="$red9">{errMsg}</Text>}
 
