@@ -1,4 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import _ from "lodash";
 import { nanoid } from "nanoid/non-secure";
 import { ThemeName } from "tamagui";
 import { create } from "zustand";
@@ -12,12 +13,14 @@ export interface IExpenses {
   amt: number;
   notes: string;
   _id: string;
+  _active: boolean;
 }
 
 export interface ICategory {
   name: string;
   icon: string;
   _id: string;
+  _active: boolean;
 }
 
 interface AppState {
@@ -40,6 +43,12 @@ interface AppState {
 
   updateMonthlyIncome: (item: IExpenses) => void;
   updateMonthlyExpenses: (item: IExpenses) => void;
+
+  setCategory: (type: "income" | "expense", item: ICategory) => void;
+  updateCategory: (type: "income" | "expense", item: ICategory) => void;
+
+  removeCategory: (_id: string) => void;
+  removeExpense: (_id: string) => void;
 }
 
 export const useAppStore = create<AppState>()(
@@ -61,12 +70,14 @@ export const useAppStore = create<AppState>()(
 
       setMonthlyIncome: (item) =>
         set((state) => {
-          state.monthlyIncome.push({ ...item, _id: nanoid(6) });
+          state.monthlyIncome.push({ ...item, _id: nanoid(12) });
         }),
+
       setMonthlyExpenses: (item) =>
         set((state) => {
-          state.monthlyExpenses.push({ ...item, _id: nanoid(6) });
+          state.monthlyExpenses.push({ ...item, _id: nanoid(12) });
         }),
+
       updateMonthlyIncome: (item) =>
         set((state) => {
           state.monthlyIncome = state.monthlyIncome.map((val) => {
@@ -76,6 +87,7 @@ export const useAppStore = create<AppState>()(
             return val;
           });
         }),
+
       updateMonthlyExpenses: (item) =>
         set((state) => {
           state.monthlyExpenses = state.monthlyExpenses.map((val) => {
@@ -85,6 +97,94 @@ export const useAppStore = create<AppState>()(
             return val;
           });
         }),
+
+      removeCategory: (_id) =>
+        set((state) => {
+          const findIncomeCategory = _.find(state.incomeCategory, { _id });
+          const findExpensesCategory = _.find(state.expensesCategory, { _id });
+
+          if (findIncomeCategory) {
+            state.incomeCategory = state.incomeCategory.map((item) => {
+              if (item._id === _id) {
+                return { ...item, _active: false };
+              } else {
+                return item;
+              }
+            });
+          }
+
+          if (findExpensesCategory) {
+            state.expensesCategory = state.expensesCategory.map((item) => {
+              if (item._id === _id) {
+                return { ...item, _active: false };
+              } else {
+                return item;
+              }
+            });
+          }
+        }),
+
+      removeExpense: (_id) =>
+        set((state) => {
+          const findIncome = _.find(state.monthlyIncome, { _id });
+          const findExpenses = _.find(state.monthlyExpenses, { _id });
+
+          if (findIncome) {
+            state.monthlyIncome = state.monthlyIncome.map((item) => {
+              if (item._id === _id) {
+                return { ...item, _active: false };
+              } else {
+                return item;
+              }
+            });
+          }
+
+          if (findExpenses) {
+            state.monthlyExpenses = state.monthlyExpenses.map((item) => {
+              if (item._id === _id) {
+                return { ...item, _active: false };
+              } else {
+                return item;
+              }
+            });
+          }
+        }),
+
+      setCategory: (type, item) => {
+        set((state) => {
+          if (type === "income") {
+            state.incomeCategory.push(item);
+          }
+
+          if (type === "expense") {
+            state.expensesCategory.push(item);
+          }
+        });
+      },
+
+      updateCategory: (type, updatedValue) => {
+        set((state) => {
+          if (type === "income") {
+            state.incomeCategory = state.incomeCategory.map((item) => {
+              if (item._id === updatedValue._id) {
+                return updatedValue;
+              } else {
+                return item;
+              }
+            });
+          }
+
+          if (type === "expense") {
+            state.expensesCategory = state.expensesCategory.map((item) => {
+              if (item._id === updatedValue._id) {
+                return updatedValue;
+              } else {
+                return item;
+              }
+            });
+          }
+        });
+      },
     })),
     {
       name: "app-storage",

@@ -175,7 +175,7 @@ const HistoryTransaction = () => {
 
           {_.isArray(transactionHistory) && !_.isEmpty(transactionHistory) && (
             <FlashList
-              data={transactionHistory}
+              data={_.filter(transactionHistory, { _active: true })}
               estimatedItemSize={transactionHistory.length}
               renderItem={renderItem}
             />

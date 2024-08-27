@@ -5,7 +5,13 @@ import {
   useNavigation,
 } from "@react-navigation/native";
 import { FlashList, ListRenderItem } from "@shopify/flash-list";
-import { ArrowDownLeft, ArrowUpRight, Eye, Pen } from "@tamagui/lucide-icons";
+import {
+  ArrowDownLeft,
+  ArrowUpRight,
+  Eye,
+  Pen,
+  Trash,
+} from "@tamagui/lucide-icons";
 import { useToggle } from "ahooks";
 import { Formik, FormikHelpers } from "formik";
 import _ from "lodash";
@@ -125,6 +131,7 @@ export const RenderTransactionList: FC<{
 }> = ({ item, toggleIncome, toggleExpenses, setEditId }) => {
   const incomeCategory = useAppStore((state) => state.incomeCategory);
   const expensesCategory = useAppStore((state) => state.expensesCategory);
+  const removeExpense = useAppStore((state) => state.removeExpense);
 
   const handleEdit = () => {
     setEditId(item._id);
@@ -136,6 +143,10 @@ export const RenderTransactionList: FC<{
     if (item.type === "OUT") {
       toggleExpenses();
     }
+  };
+
+  const handleDelete = () => {
+    removeExpense(item._id);
   };
 
   return (
@@ -179,12 +190,21 @@ export const RenderTransactionList: FC<{
           >
             {item.type === "IN" ? "+" : "-"} {item.fmtAmt}
           </Heading>
+
           <Button
             onPress={handleEdit}
             size="$3"
             p="$0"
             px="$2.5"
             icon={<Pen mb="$1" />}
+          />
+
+          <Button
+            onPress={handleDelete}
+            size="$3"
+            p="$0"
+            px="$2.5"
+            icon={<Trash mb="$1" />}
           />
         </View>
       </View>
@@ -385,7 +405,7 @@ const Home = () => {
 
           {_.isArray(transactionHistory) && !_.isEmpty(transactionHistory) && (
             <FlashList
-              data={transactionHistory}
+              data={_.filter(transactionHistory, { _active: true })}
               estimatedItemSize={transactionHistory.length}
               renderItem={renderItem}
             />

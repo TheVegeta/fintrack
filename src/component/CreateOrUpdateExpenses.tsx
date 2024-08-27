@@ -77,14 +77,16 @@ const CreateOrUpdateExpenses: FC<{
           notes: val.note,
           amt: _.toNumber(val.amt),
           date: moment(val.date).toDate(),
+          _active: true,
         });
       } else {
         setMonthlyExpenses({
-          _id: nanoid(6),
+          _id: nanoid(12),
           categoryId: val.category,
           notes: val.note,
           amt: _.toNumber(val.amt),
           date: moment(val.date).toDate(),
+          _active: true,
         });
       }
 

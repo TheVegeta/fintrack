@@ -19,6 +19,7 @@ import {
   useTheme,
   View,
 } from "tamagui";
+import { ICategory } from "../store";
 
 export const CustomInput: FC<{
   heading: string;
@@ -39,7 +40,7 @@ export const CustomInput: FC<{
 }) => {
   return (
     <View mb="$2">
-      <Text>{heading}</Text>
+      <Text>{_.upperFirst(heading)}</Text>
 
       {isTextArea ? (
         <TextArea
@@ -97,7 +98,7 @@ export const CustomDatePicker: FC<{
 
   return (
     <View mb="$2">
-      <Text>{heading}</Text>
+      <Text>{_.upperFirst(heading)}</Text>
       <Pressable onPress={handlePress}>
         <Input
           placeholder={placeholder}
@@ -123,7 +124,7 @@ export const CustomSelectCategory: FC<{
   placeholder: string;
   setFieldValue: (name: string, value: string) => void;
   fieldName: string;
-  options: { name: string; icon: string; _id: string }[];
+  options: ICategory[];
 }> = ({
   heading,
   value,
@@ -144,7 +145,7 @@ export const CustomSelectCategory: FC<{
   return (
     <>
       <View mb="$2" w="100%">
-        <Text>{heading}</Text>
+        <Text>{_.upperFirst(heading)}</Text>
       </View>
 
       <Select onValueChange={handleChange} value={_.toString(value)}>
@@ -184,16 +185,18 @@ export const CustomSelectCategory: FC<{
             <Select.Group>
               {useMemo(
                 () =>
-                  options.map((item, i) => {
-                    return (
-                      <Select.Item index={i} key={item.name} value={item._id}>
-                        <Select.ItemText>{item.name}</Select.ItemText>
-                        <Select.ItemIndicator marginLeft="auto">
-                          <Check size={16} />
-                        </Select.ItemIndicator>
-                      </Select.Item>
-                    );
-                  }),
+                  options
+                    .filter((item) => item._active === true)
+                    .map((item, i) => {
+                      return (
+                        <Select.Item index={i} key={item.name} value={item._id}>
+                          <Select.ItemText>{item.name}</Select.ItemText>
+                          <Select.ItemIndicator marginLeft="auto">
+                            <Check size={16} />
+                          </Select.ItemIndicator>
+                        </Select.Item>
+                      );
+                    }),
                 [options]
               )}
             </Select.Group>
