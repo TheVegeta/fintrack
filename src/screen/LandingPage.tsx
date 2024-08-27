@@ -150,7 +150,7 @@ const LandingPage = () => {
           />
 
           <View flex={1} w="100%">
-            {Array.isArray(currency) && currency.length !== 0 && (
+            {_.isArray(currency) && !_.isEmpty(currency) && (
               <FlashList
                 data={currency}
                 extraData={selectedCurrency}

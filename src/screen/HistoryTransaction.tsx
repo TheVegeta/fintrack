@@ -173,14 +173,13 @@ const HistoryTransaction = () => {
             </Paragraph>
           </View>
 
-          {Array.isArray(transactionHistory) &&
-            transactionHistory.length !== 0 && (
-              <FlashList
-                data={transactionHistory}
-                estimatedItemSize={transactionHistory.length}
-                renderItem={renderItem}
-              />
-            )}
+          {_.isArray(transactionHistory) && !_.isEmpty(transactionHistory) && (
+            <FlashList
+              data={transactionHistory}
+              estimatedItemSize={transactionHistory.length}
+              renderItem={renderItem}
+            />
+          )}
         </View>
       </View>
 

@@ -84,7 +84,7 @@ const History = () => {
       </View>
 
       <Separator borderWidth="$0.5" my="$2.5" />
-      {Array.isArray(monthArr) && monthArr.length !== 0 && (
+      {_.isArray(monthArr) && !_.isEmpty(monthArr) && (
         <FlashList
           data={monthArr}
           estimatedItemSize={monthArr.length}
