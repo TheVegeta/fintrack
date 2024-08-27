@@ -1,5 +1,9 @@
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
-import { useIsFocused } from "@react-navigation/native";
+import {
+  NavigationProp,
+  useIsFocused,
+  useNavigation,
+} from "@react-navigation/native";
 import { FlashList, ListRenderItem } from "@shopify/flash-list";
 import { ArrowDownLeft, ArrowUpRight, Eye } from "@tamagui/lucide-icons";
 import { useToggle } from "ahooks";
@@ -27,6 +31,7 @@ import CreateOrUpdateIncome from "../component/CreateOrUpdateIncome";
 import { CustomButton, CustomInput } from "../component/form";
 import { currencyList } from "../data/currencyList";
 import { useRunAfterInteraction } from "../hooks/useRunAfterInteraction";
+import { IRootParams } from "../Route";
 import { IExpenses, useAppStore } from "../store";
 import { findCategory } from "../utils";
 
@@ -107,7 +112,9 @@ const FloatingButton: FC<{
   );
 };
 
-const RenderTransactionList: FC<{ item: ITransactionHistory }> = ({ item }) => {
+export const RenderTransactionList: FC<{ item: ITransactionHistory }> = ({
+  item,
+}) => {
   const incomeCategory = useAppStore((state) => state.incomeCategory);
   const expensesCategory = useAppStore((state) => state.expensesCategory);
 
@@ -168,6 +175,8 @@ const Home = () => {
   const [isExpensesOpen, { toggle: toggleExpenses }] = useToggle(false);
 
   const isFocused = useIsFocused();
+
+  const { navigate } = useNavigation<NavigationProp<IRootParams>>();
 
   const [initialValue, setInitialValue] = useState({ name: "" });
   const [stat, setStat] = useState({ monthlyIncome: "", monthlyExpenses: "" });
@@ -252,6 +261,7 @@ const Home = () => {
       monthlyIncome: formatter.format(currIncome),
       monthlyExpenses: formatter.format(currExpenses),
     });
+
     setTransactionHistory(allTransaction.slice(0, 30));
   }, [isFocused, monthlyIncome, monthlyExpenses, currencyCode]);
 
@@ -265,6 +275,11 @@ const Home = () => {
       toggle();
       actions.setSubmitting(false);
     });
+  };
+
+  const handleRecentTransaction = () => {
+    const month = moment().startOf("M").toISOString();
+    navigate("historyTransaction", { date: month });
   };
 
   const renderItem: ListRenderItem<ITransactionHistory> = useCallback(
@@ -314,23 +329,31 @@ const Home = () => {
         <Separator borderWidth="$0.5" my="$2.5" />
 
         <View flex={1}>
-          <View flexDirection="row" justifyContent="space-between">
+          <View
+            flexDirection="row"
+            justifyContent="space-between"
+            onPress={handleRecentTransaction}
+          >
             <Paragraph fontSize="$6" my="$2">
               Recent Transactions
             </Paragraph>
 
             <Button
+              onPress={handleRecentTransaction}
               p="$0"
               px="$3"
               icon={<FontAwesome6 name="arrow-right" size={16} color="black" />}
             />
           </View>
 
-          <FlashList
-            data={transactionHistory}
-            estimatedItemSize={transactionHistory.length}
-            renderItem={renderItem}
-          />
+          {Array.isArray(transactionHistory) &&
+            transactionHistory.length !== 0 && (
+              <FlashList
+                data={transactionHistory}
+                estimatedItemSize={transactionHistory.length}
+                renderItem={renderItem}
+              />
+            )}
         </View>
       </View>
 
