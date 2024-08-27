@@ -37,6 +37,9 @@ interface AppState {
 
   setMonthlyIncome: (item: IExpenses) => void;
   setMonthlyExpenses: (item: IExpenses) => void;
+
+  updateMonthlyIncome: (item: IExpenses) => void;
+  updateMonthlyExpenses: (item: IExpenses) => void;
 }
 
 export const useAppStore = create<AppState>()(
@@ -63,6 +66,24 @@ export const useAppStore = create<AppState>()(
       setMonthlyExpenses: (item) =>
         set((state) => {
           state.monthlyExpenses.push({ ...item, _id: nanoid(6) });
+        }),
+      updateMonthlyIncome: (item) =>
+        set((state) => {
+          state.monthlyIncome = state.monthlyIncome.map((val) => {
+            if (val._id === item._id) {
+              return item;
+            }
+            return val;
+          });
+        }),
+      updateMonthlyExpenses: (item) =>
+        set((state) => {
+          state.monthlyExpenses = state.monthlyExpenses.map((val) => {
+            if (val._id === item._id) {
+              return item;
+            }
+            return val;
+          });
         }),
     })),
     {

@@ -5,7 +5,7 @@ import {
   useNavigation,
 } from "@react-navigation/native";
 import { FlashList, ListRenderItem } from "@shopify/flash-list";
-import { ArrowDownLeft, ArrowUpRight, Eye } from "@tamagui/lucide-icons";
+import { ArrowDownLeft, ArrowUpRight, Eye, Pen } from "@tamagui/lucide-icons";
 import { useToggle } from "ahooks";
 import { Formik, FormikHelpers } from "formik";
 import _ from "lodash";
@@ -58,10 +58,11 @@ export const renderItemIcon = (
   return null;
 };
 
-const FloatingButton: FC<{
+export const FloatingButton: FC<{
   toggleIncome: Function;
   toggleExpenses: Function;
-}> = ({ toggleExpenses, toggleIncome }) => {
+  setEditId?: (id: string) => void;
+}> = ({ toggleExpenses, toggleIncome, setEditId }) => {
   const theme = useTheme();
   const [isOpen, { toggle }] = useToggle(false);
 
@@ -81,6 +82,10 @@ const FloatingButton: FC<{
 
   const handleItemPress = (item: ItemConfig, index: number) => {
     toggle();
+
+    if (typeof setEditId === "function") {
+      setEditId("");
+    }
 
     if (item.label === "Add Expense") toggleExpenses();
 
@@ -112,54 +117,78 @@ const FloatingButton: FC<{
   );
 };
 
-export const RenderTransactionList: FC<{ item: ITransactionHistory }> = ({
-  item,
-}) => {
+export const RenderTransactionList: FC<{
+  item: ITransactionHistory;
+  toggleIncome: VoidFunction;
+  toggleExpenses: VoidFunction;
+  setEditId: (id: string) => void;
+}> = ({ item, toggleIncome, toggleExpenses, setEditId }) => {
   const incomeCategory = useAppStore((state) => state.incomeCategory);
   const expensesCategory = useAppStore((state) => state.expensesCategory);
 
-  return (
-    <View
-      key={item._id}
-      flexDirection="row"
-      alignItems="center"
-      gap="$3"
-      my="$1.5"
-      justifyContent="space-between"
-    >
-      <View flexDirection="row" alignItems="center" gap="$3">
-        <Button
-          p="$0"
-          px="$3"
-          icon={
-            item.type === "IN" ? (
-              <ArrowDownLeft size={20} mb="$1" />
-            ) : (
-              <ArrowUpRight size={20} mb="$1" />
-            )
-          }
-        />
+  const handleEdit = () => {
+    setEditId(item._id);
 
-        <View>
-          <Paragraph fontSize="$5">
-            {
-              findCategory(item.categoryId, [
+    if (item.type === "IN") {
+      toggleIncome();
+    }
+
+    if (item.type === "OUT") {
+      toggleExpenses();
+    }
+  };
+
+  return (
+    <>
+      <View
+        key={item._id}
+        flexDirection="row"
+        alignItems="center"
+        gap="$3"
+        my="$1.5"
+        justifyContent="space-between"
+      >
+        <View flexDirection="row" alignItems="center" gap="$3">
+          <Button
+            p="$0"
+            px="$3"
+            icon={
+              item.type === "IN" ? (
+                <ArrowDownLeft size={20} mb="$1" />
+              ) : (
+                <ArrowUpRight size={20} mb="$1" />
+              )
+            }
+          />
+
+          <View>
+            <Paragraph fontSize="$5">
+              {findCategory(item.categoryId, [
                 ...expensesCategory,
                 ...incomeCategory,
-              ])?.name
-            }
-          </Paragraph>
-          <Text fontSize="$1">{moment(item.date).format("DD/MM/YYYY")}</Text>
+              ])?.name || ""}
+            </Paragraph>
+            <Text fontSize="$1">{moment(item.date).format("DD/MM/YYYY")}</Text>
+          </View>
+        </View>
+
+        <View flexDirection="row" gap="$3">
+          <Heading
+            fontSize="$5"
+            color={item.type === "IN" ? "$green11" : "$gray11"}
+          >
+            {item.type === "IN" ? "+" : "-"} {item.fmtAmt}
+          </Heading>
+          <Button
+            onPress={handleEdit}
+            size="$3"
+            p="$0"
+            px="$2.5"
+            icon={<Pen mb="$1" />}
+          />
         </View>
       </View>
-
-      <Heading
-        fontSize="$5"
-        color={item.type === "IN" ? "$green11" : "$gray11"}
-      >
-        {item.type === "IN" ? "+" : "-"} {item.fmtAmt}
-      </Heading>
-    </View>
+    </>
   );
 };
 
@@ -179,6 +208,7 @@ const Home = () => {
   const { navigate } = useNavigation<NavigationProp<IRootParams>>();
 
   const [initialValue, setInitialValue] = useState({ name: "" });
+  const [editId, setEditId] = useState("");
   const [stat, setStat] = useState({ monthlyIncome: "", monthlyExpenses: "" });
   const [transactionHistory, setTransactionHistory] = useState<
     ITransactionHistory[]
@@ -283,7 +313,14 @@ const Home = () => {
   };
 
   const renderItem: ListRenderItem<ITransactionHistory> = useCallback(
-    ({ item }) => <RenderTransactionList item={item} />,
+    ({ item }) => (
+      <RenderTransactionList
+        item={item}
+        toggleExpenses={toggleExpenses}
+        toggleIncome={toggleIncome}
+        setEditId={setEditId}
+      />
+    ),
     []
   );
 
@@ -409,10 +446,21 @@ const Home = () => {
       <FloatingButton
         toggleIncome={toggleIncome}
         toggleExpenses={toggleExpenses}
+        setEditId={setEditId}
       />
 
-      <CreateOrUpdateIncome isOpen={isIncomeOpen} toggle={toggleIncome} />
-      <CreateOrUpdateExpenses isOpen={isExpensesOpen} toggle={toggleExpenses} />
+      <CreateOrUpdateIncome
+        isOpen={isIncomeOpen}
+        toggle={toggleIncome}
+        id={editId}
+        setEditId={setEditId}
+      />
+      <CreateOrUpdateExpenses
+        isOpen={isExpensesOpen}
+        toggle={toggleExpenses}
+        id={editId}
+        setEditId={setEditId}
+      />
     </>
   );
 };

@@ -2,10 +2,11 @@ import { Formik, FormikHelpers } from "formik";
 import _ from "lodash";
 import moment from "moment";
 import { nanoid } from "nanoid/non-secure";
-import React, { FC } from "react";
+import React, { FC, useState } from "react";
 import { InteractionManager } from "react-native";
 import { Sheet } from "tamagui";
 import * as Yup from "yup";
+import { useRunAfterInteraction } from "../hooks/useRunAfterInteraction";
 import { useAppStore } from "../store";
 import {
   CustomButton,
@@ -34,9 +35,31 @@ const validationSchema = Yup.object().shape({
 const CreateOrUpdateIncome: FC<{
   isOpen: boolean;
   toggle: () => void;
-}> = ({ isOpen, toggle }) => {
+  id?: string;
+  setEditId?: (id: string) => void;
+}> = ({ isOpen, toggle, id = "", setEditId }) => {
+  const [initVal, setInitVal] = useState(initialValues);
   const incomeCategory = useAppStore((state) => state.incomeCategory);
+  const monthlyIncome = useAppStore((state) => state.monthlyIncome);
   const setMonthlyIncome = useAppStore((state) => state.setMonthlyIncome);
+  const updateMonthlyIncome = useAppStore((state) => state.updateMonthlyIncome);
+
+  useRunAfterInteraction(() => {
+    if (id) {
+      const item = _.find(monthlyIncome, { _id: id });
+
+      if (item) {
+        setInitVal({
+          amt: _.toString(item.amt),
+          category: item.categoryId,
+          date: moment(item.date).toISOString(),
+          note: item.notes,
+        });
+      }
+    } else {
+      setInitVal(initialValues);
+    }
+  }, [id]);
 
   const handleSubmit = (
     val: typeof initialValues,
@@ -45,17 +68,32 @@ const CreateOrUpdateIncome: FC<{
     InteractionManager.runAfterInteractions(() => {
       actions.setSubmitting(true);
 
-      setMonthlyIncome({
-        _id: nanoid(6),
-        categoryId: val.category,
-        notes: val.note,
-        amt: _.toNumber(val.amt),
-        date: moment(val.date).toDate(),
-      });
+      if (id) {
+        updateMonthlyIncome({
+          _id: id,
+          categoryId: val.category,
+          notes: val.note,
+          amt: _.toNumber(val.amt),
+          date: moment(val.date).toDate(),
+        });
+      } else {
+        setMonthlyIncome({
+          _id: nanoid(6),
+          categoryId: val.category,
+          notes: val.note,
+          amt: _.toNumber(val.amt),
+          date: moment(val.date).toDate(),
+        });
+      }
 
       actions.resetForm();
 
       actions.setSubmitting(false);
+
+      if (typeof setEditId === "function") {
+        setEditId("");
+        setInitVal(initialValues);
+      }
 
       toggle();
     });
@@ -78,9 +116,10 @@ const CreateOrUpdateIncome: FC<{
         <Sheet.Handle />
         <Sheet.Frame px="$6" py="$4">
           <Formik
-            initialValues={initialValues}
+            initialValues={initVal}
             validationSchema={validationSchema}
             onSubmit={handleSubmit}
+            enableReinitialize={true}
           >
             {({
               handleChange,
