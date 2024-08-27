@@ -30,7 +30,10 @@ import { useRunAfterInteraction } from "../hooks/useRunAfterInteraction";
 import { IExpenses, useAppStore } from "../store";
 import { findCategory } from "../utils";
 
-type ITransactionHistory = IExpenses & { type: "IN" | "OUT"; fmtAmt: string };
+export type ITransactionHistory = IExpenses & {
+  type: "IN" | "OUT";
+  fmtAmt: string;
+};
 
 const validationSchema = Yup.object().shape({
   name: Yup.string()
