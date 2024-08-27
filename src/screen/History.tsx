@@ -84,12 +84,13 @@ const History = () => {
       </View>
 
       <Separator borderWidth="$0.5" my="$2.5" />
-
-      <FlashList
-        data={monthArr}
-        estimatedItemSize={monthArr.length}
-        renderItem={renderItem}
-      />
+      {Array.isArray(monthArr) && monthArr.length !== 0 && (
+        <FlashList
+          data={monthArr}
+          estimatedItemSize={monthArr.length}
+          renderItem={renderItem}
+        />
+      )}
     </View>
   );
 };

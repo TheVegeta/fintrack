@@ -150,12 +150,14 @@ const LandingPage = () => {
           />
 
           <View flex={1} w="100%">
-            <FlashList
-              data={currency}
-              extraData={selectedCurrency}
-              estimatedItemSize={currency.length}
-              renderItem={renderItem}
-            />
+            {Array.isArray(currency) && currency.length !== 0 && (
+              <FlashList
+                data={currency}
+                extraData={selectedCurrency}
+                estimatedItemSize={currency.length}
+                renderItem={renderItem}
+              />
+            )}
           </View>
 
           <Button w="100%" onPress={handleSubmit}>
