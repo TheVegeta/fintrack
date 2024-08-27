@@ -34,7 +34,12 @@ const RenderMonthList: FC<{ month: string }> = ({ month }) => {
       <Paragraph fontSize="$5">
         {moment(month).format("MMM")} {moment(month).format("Y")}
       </Paragraph>
-      <Button p="$0" px="$3" icon={<ArrowRight size={20} mb="$1" />} />
+      <Button
+        onPress={handleNavigate}
+        p="$0"
+        px="$3"
+        icon={<ArrowRight size={20} mb="$1" />}
+      />
     </View>
   );
 };
