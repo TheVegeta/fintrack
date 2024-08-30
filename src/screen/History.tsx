@@ -63,7 +63,7 @@ const History = () => {
       moment(a).toISOString().localeCompare(moment(b).toISOString())
     );
 
-    setMonthArr(uniqArr);
+    setMonthArr(_.reverse(uniqArr));
   }, [monthlyExpenses, isFocused]);
 
   const renderItem: ListRenderItem<string> = useCallback(

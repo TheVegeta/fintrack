@@ -260,19 +260,35 @@ const Home = () => {
     });
 
     _.filter(monthlyExpenses, { _active: true }).map((item) => {
-      tempTransaction.push({
-        ...item,
-        type: "OUT",
-        fmtAmt: formatter.format(item.amt),
-      });
+      const itemDate = moment(item.date).startOf("D").add(12, "hour");
+      const startDate = moment().startOf("month");
+      const endDate = moment().endOf("month");
+
+      const isBetween = itemDate.isBetween(startDate, endDate);
+
+      if (isBetween) {
+        tempTransaction.push({
+          ...item,
+          type: "OUT",
+          fmtAmt: formatter.format(item.amt),
+        });
+      }
     });
 
     _.filter(monthlyIncome, { _active: true }).map((item) => {
-      tempTransaction.push({
-        ...item,
-        type: "IN",
-        fmtAmt: formatter.format(item.amt),
-      });
+      const itemDate = moment(item.date).startOf("D").add(12, "hour");
+      const startDate = moment().startOf("month");
+      const endDate = moment().endOf("month");
+
+      const isBetween = itemDate.isBetween(startDate, endDate);
+
+      if (isBetween) {
+        tempTransaction.push({
+          ...item,
+          type: "IN",
+          fmtAmt: formatter.format(item.amt),
+        });
+      }
     });
 
     const allTransaction = tempTransaction.sort((a, b) => {
@@ -352,7 +368,7 @@ const Home = () => {
             <Paragraph mb="$-true">Hello,</Paragraph>
             <Heading mt="$2.5">{_.capitalize(userName)}</Heading>
           </View>
-          <View mt="$5">
+          <View mt="$5" flexDirection="row" gap="$2">
             <Button icon={Eye} scaleIcon={1.5} onPress={toggle} />
           </View>
         </View>

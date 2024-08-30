@@ -59,19 +59,35 @@ const HistoryTransaction = () => {
       });
 
       _.filter(monthlyExpenses, { _active: true }).map((item) => {
-        tempTransaction.push({
-          ...item,
-          type: "OUT",
-          fmtAmt: formatter.format(item.amt),
-        });
+        const itemDate = moment(item.date).startOf("D").add(12, "hour");
+        const startDate = moment(params.date).startOf("month");
+        const endDate = moment(params.date).endOf("month");
+
+        const isBetween = itemDate.isBetween(startDate, endDate);
+
+        if (isBetween) {
+          tempTransaction.push({
+            ...item,
+            type: "OUT",
+            fmtAmt: formatter.format(item.amt),
+          });
+        }
       });
 
       _.filter(monthlyIncome, { _active: true }).map((item) => {
-        tempTransaction.push({
-          ...item,
-          type: "IN",
-          fmtAmt: formatter.format(item.amt),
-        });
+        const itemDate = moment(item.date).startOf("D").add(12, "hour");
+        const startDate = moment(params.date).startOf("month");
+        const endDate = moment(params.date).endOf("month");
+
+        const isBetween = itemDate.isBetween(startDate, endDate);
+
+        if (isBetween) {
+          tempTransaction.push({
+            ...item,
+            type: "IN",
+            fmtAmt: formatter.format(item.amt),
+          });
+        }
       });
 
       const allTransaction = tempTransaction.sort((a, b) => {
