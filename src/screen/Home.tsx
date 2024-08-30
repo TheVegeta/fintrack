@@ -263,7 +263,7 @@ const Home = () => {
       currency: tempCurrencyCode,
     });
 
-    monthlyExpenses.map((item) => {
+    _.filter(monthlyExpenses, { _active: true }).map((item) => {
       tempTransaction.push({
         ...item,
         type: "OUT",
@@ -271,7 +271,7 @@ const Home = () => {
       });
     });
 
-    monthlyIncome.map((item) => {
+    _.filter(monthlyIncome, { _active: true }).map((item) => {
       tempTransaction.push({
         ...item,
         type: "IN",
@@ -283,7 +283,7 @@ const Home = () => {
       return moment(b.date).unix() - moment(a.date).unix();
     });
 
-    monthlyIncome.map((item) => {
+    _.filter(monthlyIncome, { _active: true }).map((item) => {
       const itemDate = moment(item.date).startOf("D").add(12, "hour");
       const startDate = moment().startOf("month");
       const endDate = moment().endOf("month");
@@ -295,7 +295,7 @@ const Home = () => {
       }
     });
 
-    monthlyExpenses.map((item) => {
+    _.filter(monthlyExpenses, { _active: true }).map((item) => {
       const itemDate = moment(item.date).startOf("D").add(12, "hour");
       const startDate = moment().startOf("month");
       const endDate = moment().endOf("month");

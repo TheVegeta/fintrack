@@ -58,7 +58,7 @@ const HistoryTransaction = () => {
         currency: tempCurrencyCode,
       });
 
-      monthlyExpenses.map((item) => {
+      _.filter(monthlyExpenses, { _active: true }).map((item) => {
         tempTransaction.push({
           ...item,
           type: "OUT",
@@ -66,7 +66,7 @@ const HistoryTransaction = () => {
         });
       });
 
-      monthlyIncome.map((item) => {
+      _.filter(monthlyIncome, { _active: true }).map((item) => {
         tempTransaction.push({
           ...item,
           type: "IN",
@@ -78,7 +78,7 @@ const HistoryTransaction = () => {
         return moment(a.date).unix() - moment(b.date).unix();
       });
 
-      monthlyIncome.map((item) => {
+      _.filter(monthlyIncome, { _active: true }).map((item) => {
         const itemDate = moment(item.date).startOf("D").add(12, "hour");
         const startDate = moment(params.date).startOf("month");
         const endDate = moment(params.date).endOf("month");
@@ -90,7 +90,7 @@ const HistoryTransaction = () => {
         }
       });
 
-      monthlyExpenses.map((item) => {
+      _.filter(monthlyExpenses, { _active: true }).map((item) => {
         const itemDate = moment(item.date).startOf("D").add(12, "hour");
         const startDate = moment(params.date).startOf("month");
         const endDate = moment(params.date).endOf("month");
