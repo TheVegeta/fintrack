@@ -2,13 +2,14 @@ import {
   DateTimePickerAndroid,
   DateTimePickerEvent,
 } from "@react-native-community/datetimepicker";
-import { Check } from "@tamagui/lucide-icons";
+import { Check, Trash } from "@tamagui/lucide-icons";
 import _ from "lodash";
 import moment from "moment";
 import { FC, useMemo } from "react";
 import { Pressable, useWindowDimensions } from "react-native";
 import {
   Adapt,
+  AlertDialog,
   Button,
   Input,
   Select,
@@ -18,6 +19,8 @@ import {
   TextArea,
   useTheme,
   View,
+  XStack,
+  YStack,
 } from "tamagui";
 import { ICategory } from "../store";
 
@@ -221,5 +224,64 @@ export const CustomButton: FC<{
         Submit
       </Button>
     </View>
+  );
+};
+
+export const CofirmationButton: FC<{
+  onPress: VoidFunction;
+  title: string;
+  subtitle: string;
+}> = ({ onPress, subtitle, title }) => {
+  return (
+    <>
+      <AlertDialog native>
+        <AlertDialog.Trigger asChild>
+          <Button size="$3" p="$0" px="$2.5" icon={<Trash mb="$1" />} />
+        </AlertDialog.Trigger>
+
+        <AlertDialog.Portal>
+          <AlertDialog.Overlay
+            key="overlay"
+            animation="quick"
+            opacity={0.5}
+            enterStyle={{ opacity: 0 }}
+            exitStyle={{ opacity: 0 }}
+          />
+          <AlertDialog.Content
+            bordered
+            elevate
+            key="content"
+            animation={[
+              "quick",
+              {
+                opacity: {
+                  overshootClamping: true,
+                },
+              },
+            ]}
+            enterStyle={{ x: 0, y: -20, opacity: 0, scale: 0.9 }}
+            exitStyle={{ x: 0, y: 10, opacity: 0, scale: 0.95 }}
+            x={0}
+            scale={1}
+            opacity={1}
+            y={0}
+          >
+            <YStack space>
+              <AlertDialog.Title>{title}</AlertDialog.Title>
+              <AlertDialog.Description>{subtitle}</AlertDialog.Description>
+
+              <XStack gap="$3" justifyContent="flex-end">
+                <AlertDialog.Cancel asChild>
+                  <Button>Cancel</Button>
+                </AlertDialog.Cancel>
+                <AlertDialog.Action onPress={onPress} asChild>
+                  <Button theme="active">Accept</Button>
+                </AlertDialog.Action>
+              </XStack>
+            </YStack>
+          </AlertDialog.Content>
+        </AlertDialog.Portal>
+      </AlertDialog>
+    </>
   );
 };

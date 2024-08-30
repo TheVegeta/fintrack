@@ -5,13 +5,7 @@ import {
   useNavigation,
 } from "@react-navigation/native";
 import { FlashList, ListRenderItem } from "@shopify/flash-list";
-import {
-  ArrowDownLeft,
-  ArrowUpRight,
-  Eye,
-  Pen,
-  Trash,
-} from "@tamagui/lucide-icons";
+import { ArrowDownLeft, ArrowUpRight, Eye, Pen } from "@tamagui/lucide-icons";
 import { useToggle } from "ahooks";
 import { Formik, FormikHelpers } from "formik";
 import _ from "lodash";
@@ -34,7 +28,11 @@ import {
 import * as Yup from "yup";
 import CreateOrUpdateExpenses from "../component/CreateOrUpdateExpenses";
 import CreateOrUpdateIncome from "../component/CreateOrUpdateIncome";
-import { CustomButton, CustomInput } from "../component/form";
+import {
+  CofirmationButton,
+  CustomButton,
+  CustomInput,
+} from "../component/form";
 import { currencyList } from "../data/currencyList";
 import { useRunAfterInteraction } from "../hooks/useRunAfterInteraction";
 import { IRootParams } from "../Route";
@@ -199,12 +197,10 @@ export const RenderTransactionList: FC<{
             icon={<Pen mb="$1" />}
           />
 
-          <Button
+          <CofirmationButton
             onPress={handleDelete}
-            size="$3"
-            p="$0"
-            px="$2.5"
-            icon={<Trash mb="$1" />}
+            title="Delete Expense"
+            subtitle="Are you sure you want to delete this expense?"
           />
         </View>
       </View>
