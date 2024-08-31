@@ -1,4 +1,4 @@
-import { FontAwesome6 } from "@expo/vector-icons";
+import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import { FlashList, ListRenderItem } from "@shopify/flash-list";
 import { Pen, Trash } from "@tamagui/lucide-icons";
 import { useToggle } from "ahooks";
