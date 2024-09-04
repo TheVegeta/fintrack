@@ -40,7 +40,8 @@
     "react-native-svg": "15.2.0",
     "tamagui": "^1.109.5",
     "yup": "^1.4.0",
-    "zustand": "^4.5.5"
+    "zustand": "^4.5.5",
+    "expo-splash-screen": "~0.27.5"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
